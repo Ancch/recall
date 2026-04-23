@@ -26,6 +26,7 @@
     "puppeteer": "^24.37.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
+    "uuid": "^14.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

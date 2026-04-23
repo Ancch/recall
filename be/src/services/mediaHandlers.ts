@@ -1,5 +1,6 @@
 import axios from 'axios';
-import puppeteer from 'puppeteer';
+import fs from 'fs';
+import puppeteer, { type LaunchOptions } from 'puppeteer';
 
 export interface YouTubeMetadata {
   title: string;
@@ -53,8 +54,9 @@ export const fetchYouTube = async (url: string): Promise<ContentMetadata> => {
 };
 
 export const fetchTwitter = async (url: string): Promise<ContentMetadata> => {
-  const browser = await puppeteer.launch({
-    headless: true,  
+  const execPath = getChromeExecutablePath();
+  const launchOptions: LaunchOptions = {
+    headless: true,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -66,8 +68,10 @@ export const fetchTwitter = async (url: string): Promise<ContentMetadata> => {
       '--disable-gpu',
       '--ignore-certificate-errors'
     ],
-    timeout: 60000
-  });
+    timeout: 60000,
+  };
+  if (execPath) launchOptions.executablePath = execPath;
+  const browser = await puppeteer.launch(launchOptions);
   try {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
@@ -96,9 +100,9 @@ export const fetchTwitter = async (url: string): Promise<ContentMetadata> => {
 };
 
 export const fetchWebsite = async (url: string): Promise<ContentMetadata> => {
-
-  const browser = await puppeteer.launch({
-    headless: true,  
+  const execPath = getChromeExecutablePath();
+  const launchOptions: LaunchOptions = {
+    headless: true,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -110,8 +114,10 @@ export const fetchWebsite = async (url: string): Promise<ContentMetadata> => {
       '--disable-gpu',
       '--ignore-certificate-errors'
     ],
-    timeout: 60000
-  });
+    timeout: 60000,
+  };
+  if (execPath) launchOptions.executablePath = execPath;
+  const browser = await puppeteer.launch(launchOptions);
   try {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
@@ -218,4 +224,27 @@ function extractYoutubeVideoId(url: string): string {
 function extractTweetId(url: string): string {
   const matches = url.match(/twitter\.com\/\w+\/status\/(\d+)/);
   return matches?.[1] ?? '';
+}
+
+function getChromeExecutablePath(): string | undefined {
+  const envPath = process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH || process.env.CHROMIUM_PATH;
+  if (envPath && fs.existsSync(envPath)) return envPath;
+
+  const candidates = [
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+    '/snap/bin/chromium',
+    '/usr/bin/chrome'
+  ];
+
+  for (const p of candidates) {
+    try {
+      if (fs.existsSync(p)) return p;
+    } catch (e) {
+      // ignore
+    }
+  }
+  return undefined;
 }

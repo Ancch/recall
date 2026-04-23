@@ -1,20 +1,20 @@
-import Groq from "groq-sdk";
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+const OLLAMA_URL = "http://127.0.0.1:11434";
 
 export async function generateText(prompt: string): Promise<string> {
-  const completion = await groq.chat.completions.create({
-    model: "llama3-8b-8192",
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    temperature: 0.4,
+  const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "mistral",   
+      prompt,
+      stream: false
+    })
   });
 
-  return completion.choices[0]?.message?.content || "";
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+
+  const json = await res.json();
+  return json.response?.trim() || "";
 }

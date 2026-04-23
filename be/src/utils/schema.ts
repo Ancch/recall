@@ -13,6 +13,16 @@ export const signinschema = z.object({
     password: z.string()
 });
 
+export const contentSchema = z.object({
+    link: z.string().url().optional().or(z.literal("")),
+    title: z.string().max(200).optional(),
+    content: z.string().optional()
+}).refine((data) =>  {
+    return data.link || data.content;
+}, {
+    message: "Either link or content is required"
+})
+
 export const searchSchema = z.object({
     query: z.string().min(1, { 
         message: "Search query is required"

@@ -1,3 +1,4 @@
+import { Request } from "express";
 import mongoose from "mongoose";
 
 
@@ -24,3 +25,7 @@ export interface Link {
     hash: string;
 }
 
+
+export interface AuthenticatedRequest<P = any> extends Request<P> {
+    userId?: string;
+}

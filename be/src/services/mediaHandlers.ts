@@ -35,8 +35,17 @@ export const fetchYouTube = async (url: string): Promise<ContentMetadata> => {
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1];
     if (!videoId) throw new Error('Invalid YouTube URL');
 
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    if (!apiKey) {
+      return {
+        title: `YouTube Video (${videoId})`,
+        content: url,
+        thumbnail: null,
+      };
+    }
+
     const response = await axios.get(
-      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${process.env.YOUTUBE_API_KEY}&part=snippet`
+      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet`
     );
 
     const video = response.data.items[0]?.snippet;

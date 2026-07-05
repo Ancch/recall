@@ -7,15 +7,17 @@ interface AuthenticatedRequest extends Request {
 
 export function auth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-        const token = req.headers["authorization"];
+        const authHeader = req.headers["authorization"];
 
-        if (!token) {
+        if (!authHeader) {
             res.status(401).json({ message: "Auth token missing"});
             return;
         }
 
+        const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
+
         const decodedToken = jwt.verify(
-            token as string,
+            token,
             process.env.JWT_SECRET || ''
         ) as JwtPayload;
 

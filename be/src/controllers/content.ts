@@ -120,6 +120,8 @@ export const getContent = async (req: AuthenticatedRequest, res: Response): Prom
                 type: item.type,
                 content: item.content,
                 link: item.link || null,
+                imageUrl: item.imageUrl || null,
+                tag: item.tag || [],
                 userId: item.userId,
                 createdAt: item.createdAt
             })),

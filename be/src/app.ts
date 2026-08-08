@@ -7,10 +7,8 @@ import cors from "cors";
 
 const app = express();
 const allowedOrigins = [
-  "https://consciousapp.vercel.app",
-  "https://cronify-web-rho.vercel.app",
-  "http://localhost:5173",
-  "http://localhost:3000"
+  "https://recall-qzcjm6mjt-annch.vercel.app",
+
 ];
 
 app.use(cors({
